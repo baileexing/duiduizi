@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>天对地 · 对对子</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fdf8ed;--bg2:#f5edd8;--card:#fff;
+  --ink:#2c1a06;--ink2:#6b4a22;--ink3:#a07848;
+  --red:#c8321a;--red-lt:#fdecea;
+  --gold:#c8860a;--gold-lt:#fff8e8;
+  --green:#2a7a48;--grn-lt:#eaf7f0;
+  --blue:#1a5fa0;--blue-lt:#eaf1fc;
+  --purple:#6b3fa0;--pur-lt:#f3eeff;
+  --border:rgba(44,26,6,.10);--shadow:0 2px 16px rgba(44,26,6,.08);
+}
+body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:18px 14px 72px}
+#app{width:100%;max-width:480px}
+.screen{display:none}
+.screen.active{display:block;animation:up .28s cubic-bezier(.22,1,.36,1)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px 20px;box-shadow:var(--shadow);position:relative}
+
+/* ── BRAND ── */
+.brand-hero{text-align:center;padding:24px 0 20px}
+.brand-big{font-size:54px;font-weight:900;color:var(--red);letter-spacing:12px;line-height:1;text-shadow:2px 2px 0 rgba(200,50,26,.12)}
+.brand-en{font-size:10px;letter-spacing:6px;color:var(--ink3);margin-top:5px;font-family:"PingFang SC",sans-serif;font-weight:400}
+.brand-sample{font-size:17px;color:var(--ink2);margin-top:12px;letter-spacing:4px;line-height:2.1}
+.brand-sample span{color:var(--red);font-weight:700}
+
+/* ── LEVELS ── */
+.levels-title{font-size:11px;letter-spacing:3px;color:var(--ink3);margin-bottom:14px;font-family:"PingFang SC",sans-serif;font-weight:400}
+.level-grid{display:flex;flex-direction:column;gap:10px}
+.lv-card{display:flex;align-items:center;gap:14px;padding:16px 16px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;transition:border-color .18s,background .18s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none}
+.lv-card:active{transform:scale(.975)}
+.lv-card.unlocked:hover{border-color:rgba(200,50,26,.35);background:rgba(200,50,26,.03)}
+.lv-card.locked{opacity:.48;cursor:default}
+.lv-icon{font-size:28px;flex-shrink:0;width:40px;text-align:center}
+.lv-body{flex:1;min-width:0}
+.lv-name{font-size:15px;font-weight:700;color:var(--ink)}
+.lv-sub{font-size:11px;color:var(--ink3);margin-top:2px;font-family:"PingFang SC",sans-serif;font-weight:400}
+.lv-right{flex-shrink:0;text-align:right}
+.lv-stars{font-size:14px;letter-spacing:1px}
+.lv-pct{font-size:11px;color:var(--ink3);margin-top:2px;font-family:"PingFang SC",sans-serif}
+.lock-icon{font-size:18px;color:var(--ink3)}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{margin-bottom:18px}
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--ink3)}
+.prog{height:6px;background:rgba(44,26,6,.08);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--red) 0%,var(--gold) 100%);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+/* ── TOP BAR ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;min-height:34px}
+.logo-sm{font-size:13px;font-weight:700;color:var(--red);letter-spacing:2px;cursor:pointer}
+.hd-right{display:flex;align-items:center;gap:10px}
+.streak{display:flex;align-items:center;gap:4px;background:var(--gold-lt);border:1px solid rgba(200,134,10,.25);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--gold);transition:all .2s}
+.streak.pulse{animation:pulse .35s ease}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
+.lv-badge{font-size:11px;color:var(--ink3);font-family:"PingFang SC",sans-serif;padding:3px 9px;border-radius:10px;border:1px solid var(--border)}
+
+/* ── COUPLET ── */
+.src-tag{font-size:10px;letter-spacing:2px;color:var(--ink3);font-family:"PingFang SC",sans-serif;font-weight:400;margin-bottom:12px}
+.q-label{font-size:11px;letter-spacing:2px;color:var(--ink3);font-family:"PingFang SC",sans-serif;font-weight:400;margin-bottom:12px}
+.couplet-box{text-align:center;padding:16px 0 20px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.couplet-line{font-size:30px;font-weight:700;color:var(--ink);letter-spacing:6px;line-height:1.4}
+.blank{display:inline-block;min-width:32px;padding:0 3px;height:36px;line-height:36px;border-bottom:3px solid var(--red);color:var(--red);font-size:26px;vertical-align:middle;text-align:center;letter-spacing:4px;box-sizing:content-box}
+.couplet-line2{font-size:18px;color:var(--ink3);letter-spacing:4px;margin-top:8px}
+
+/* ── OPTIONS ── */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{padding:14px 6px;border:2px solid var(--border);border-radius:13px;background:var(--card);font-size:22px;font-weight:700;color:var(--ink);text-align:center;cursor:pointer;letter-spacing:3px;transition:border-color .15s,background .15s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none}
+.opt:hover:not(:disabled){border-color:rgba(200,50,26,.35);background:rgba(200,50,26,.04)}
+.opt:active:not(:disabled){transform:scale(.955)}
+.opt.correct{border-color:var(--green);background:var(--grn-lt);color:var(--green);animation:correctPop .35s cubic-bezier(.22,1,.36,1)}
+.opt.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red);animation:wrongShake .38s ease}
+.opt.reveal{border-color:var(--green);background:var(--grn-lt);color:var(--green)}
+.opt:disabled{cursor:default}
+@keyframes correctPop{0%{transform:scale(1)}35%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── FEEDBACK ── */
+.feedback{margin-top:16px;border-radius:13px;padding:15px;display:none;border:1px solid transparent}
+.feedback.show{display:block;animation:up .25s ease}
+.feedback.ok{background:var(--grn-lt);border-color:rgba(42,122,72,.2)}
+.feedback.err{background:var(--red-lt);border-color:rgba(200,50,26,.18)}
+.fb-head{font-size:15px;font-weight:700;margin-bottom:8px;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.fb-head.ok{color:var(--green)}
+.fb-head.err{color:var(--red)}
+.full-couplet{font-size:17px;font-weight:700;letter-spacing:3px;color:var(--ink);margin-bottom:10px;padding:10px 14px;background:rgba(44,26,6,.04);border-radius:8px;line-height:1.85}
+.full-couplet .hl{color:var(--red)}
+.fb-exp{font-size:13px;color:var(--ink2);line-height:1.9;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-weight:400}
+
+.hint-row{margin-bottom:10px;padding:8px 14px;background:rgba(200,134,10,.08);border-radius:10px;border-left:3px solid var(--gold);text-align:left}
+.hint-tag{font-size:10px;letter-spacing:2px;color:var(--gold);font-family:"PingFang SC",sans-serif;font-weight:700;display:block;margin-bottom:4px}
+.hint-txt{font-size:22px;font-weight:700;color:var(--ink2);letter-spacing:5px}
+/* ── SPEAK ── */
+.speak-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;margin-bottom:12px;border-radius:20px;border:1.5px solid rgba(42,122,72,.35);background:rgba(42,122,72,.08);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:background .15s;-webkit-tap-highlight-color:transparent;line-height:1}
+.speak-btn.err-s{background:rgba(200,50,26,.07);border-color:rgba(200,50,26,.3);color:var(--red)}
+.speak-btn:hover{background:rgba(42,122,72,.16)}
+.speak-icon{font-size:16px}
+.speak-btn.speaking .speak-icon{animation:speakPulse .55s ease infinite alternate}
+@keyframes speakPulse{from{transform:scale(1)}to{transform:scale(1.28)}}
+
+/* ── NEXT BTN ── */
+.next-btn{display:block;width:100%;margin-top:14px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:opacity .15s,transform .12s;-webkit-tap-highlight-color:transparent;letter-spacing:2px}
+.next-btn:hover{opacity:.9}
+.next-btn:active{transform:scale(.97)}
+
+/* ── LEVEL END ── */
+#lvend-screen{text-align:center}
+.lvend-icon{font-size:56px;margin-bottom:10px}
+.lvend-stars{font-size:36px;letter-spacing:6px;margin:10px 0 6px}
+.lvend-score{font-size:56px;font-weight:900;color:var(--red);line-height:1}
+.lvend-label{font-size:12px;color:var(--ink3);font-family:"PingFang SC",sans-serif;margin:4px 0 4px}
+.lvend-title{font-size:24px;font-weight:900;margin:10px 0 4px}
+.lvend-desc{font-size:14px;color:var(--ink2);margin-bottom:20px;line-height:1.7;font-family:"PingFang SC",sans-serif}
+.unlock-box{background:var(--gold-lt);border:1px solid rgba(200,134,10,.3);border-radius:13px;padding:14px 16px;margin-bottom:18px;text-align:left}
+.unlock-box h3{font-size:13px;color:var(--gold);font-family:"PingFang SC",sans-serif;font-weight:700;margin-bottom:6px}
+.unlock-box p{font-size:13px;color:var(--ink2);font-family:"PingFang SC",sans-serif;line-height:1.7}
+.hist-wrap{text-align:left;margin-bottom:18px}
+.hist-head{font-size:11px;letter-spacing:2px;color:var(--ink3);margin-bottom:8px;font-family:"PingFang SC",sans-serif}
+.hist-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.hist-row:last-child{border-bottom:none}
+.hist-q{flex:1;color:var(--ink2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px}
+.hist-a{font-weight:700;flex-shrink:0;font-size:13px}
+.fin-btns{display:flex;flex-direction:column;gap:10px}
+.btn-red{padding:15px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:3px;font-family:"PingFang SC",sans-serif;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+.btn-red:hover{opacity:.9}
+.btn-outline{padding:14px;background:transparent;color:var(--red);border:1.5px solid rgba(200,50,26,.35);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:2px;font-family:"PingFang SC",sans-serif;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.btn-outline:hover{background:rgba(200,50,26,.04)}
+
+@media(max-width:400px){.brand-big{font-size:44px;letter-spacing:8px}.couplet-line{font-size:24px;letter-spacing:4px}.opt{font-size:18px;padding:12px 4px}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ 关卡地图 ══ -->
+<div id="map-screen" class="screen active">
+  <div class="brand-hero">
+    <div class="brand-big">对对子</div>
+    <div class="brand-en">DUÌDUÌZǏ · 笠翁对韵全文</div>
+    <div class="brand-sample">天对<span>地</span>，雨对<span>风</span><br>大陆对<span>长空</span></div>
+  </div>
+  <div class="card">
+    <div class="levels-title">选择关卡 · 逐级解锁</div>
+    <div class="level-grid" id="level-grid"></div>
+  </div>
+</div>
+
+<!-- ══ 游戏 ══ -->
+<div id="game-screen" class="screen">
+  <div class="top-bar">
+    <span class="logo-sm" id="back-btn">← 返回</span>
+    <div class="hd-right">
+      <div class="streak" id="streak-badge"><span class="speak-icon">🔥</span><span id="streak-n">0</span><span style="font-size:11px;font-family:'PingFang SC',sans-serif">连击</span></div>
+      <span style="font-size:13px;color:var(--ink3)" id="score-badge">0分</span>
+    </div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-meta"><span id="prog-txt">第 1 题</span><span id="prog-pct">0 / 20</span></div>
+    <div class="prog"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="src-tag" id="src-tag"></div>
+    <div class="q-label">选出正确的对子</div>
+    <div class="couplet-box">
+      <div class="hint-row" id="hint-row" style="display:none">
+        <span class="hint-tag" id="hint-tag">上联</span>
+        <span class="hint-txt" id="hint-txt"></span>
+      </div>
+      <div class="couplet-line" id="q-line1"></div>
+      <div class="couplet-line2" id="q-line2"></div>
+    </div>
+    <div class="opts" id="opts-grid">
+      <button class="opt" id="opt0"></button>
+      <button class="opt" id="opt1"></button>
+      <button class="opt" id="opt2"></button>
+      <button class="opt" id="opt3"></button>
+    </div>
+    <div class="feedback" id="feedback">
+      <div class="fb-head" id="fb-head"></div>
+      <button class="speak-btn" id="speak-btn" onclick="replaySpeak()"><span class="speak-icon">🔊</span> 朗读对子</button>
+      <div class="full-couplet" id="full-couplet"></div>
+      <div class="fb-exp" id="fb-exp"></div>
+      <button class="next-btn" id="next-btn">继续下一题 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 关卡结束 ══ -->
+<div id="lvend-screen" class="screen">
+  <div class="card">
+    <div class="lvend-icon" id="le-icon">🏆</div>
+    <div class="lvend-stars" id="le-stars">⭐⭐⭐</div>
+    <div class="lvend-score" id="le-score">0</div>
+    <div class="lvend-label">分（满分 <span id="le-max">100</span>）</div>
+    <div class="lvend-title" id="le-title">进士</div>
+    <div class="lvend-desc"  id="le-desc">再接再厉！</div>
+    <div class="unlock-box" id="le-unlock" style="display:none">
+      <h3>🔓 解锁新关卡</h3>
+      <p id="le-unlock-txt"></p>
+    </div>
+    <div class="hist-wrap">
+      <div class="hist-head">本关回顾</div>
+      <div id="le-hist"></div>
+    </div>
+    <div class="fin-btns">
+      <button class="btn-red"     id="le-next-btn">挑战下一关 →</button>
+      <button class="btn-outline" id="le-retry-btn">再练一遍 ↩</button>
+      <button class="btn-outline" id="le-map-btn">返回关卡地图</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+<script>
+/* ============================================================
+   题库 — 5关 × 20题 = 100题
+   格式: before,blank,after,line2,opts[4],full,exp,src
+============================================================ */
+var DB = [
+
+/* ── 第1关：天地初开（卷一·天韵、冬韵）20题 ── */
+{before:"天对",blank:"地",after:"，雨对风",line2:"",
+ opts:["地","山","水","空"],
+ full:"天对地，雨对风。\n大陆对长空。",
+ exp:"天在上，地在下，这是最基本的对仗。《笠翁对韵》开篇第一对，也是学对联的起点。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"大陆对",blank:"长空",after:"",line2:"山花对海树",
+ opts:["长空","深海","青山","白云"],
+ full:"大陆对长空。\n山花对海树，赤日对苍穹。",
+ exp:"大陆（广阔的土地）对长空（辽阔的天空），一地一天，空间壮阔。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"山花对",blank:"海树",after:"",line2:"赤日对苍穹",
+ opts:["海树","江月","湖草","云松"],
+ full:"山花对海树，\n赤日对苍穹。",
+ exp:"山中之花对海边之树，山与海（地理）、花与树（植物）双重对仗，意象开阔壮美。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"赤日对",blank:"苍穹",after:"",line2:"雷隐隐，雾蒙蒙",
+ opts:["苍穹","碧海","青山","玄天"],
+ full:"赤日对苍穹。\n雷隐隐，雾蒙蒙，日下对天中。",
+ exp:"赤日（红彤彤的太阳）对苍穹（青苍的天空），颜色（赤/苍）与意象（日/穹）双重对仗。苍穹就是天空，「穹」字形如拱顶。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"雷隐隐，",blank:"雾蒙蒙",after:"",line2:"日下对天中",
+ opts:["雾蒙蒙","云茫茫","雪纷纷","风萧萧"],
+ full:"雷隐隐，雾蒙蒙，\n日下对天中。",
+ exp:"雷隐隐（雷声隐约）对雾蒙蒙（雾气弥漫），叠字对叠字，读来朗朗上口，是《笠翁对韵》最好玩的句式。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"风高秋月",blank:"白",after:"，雨霁晚霞红",line2:"",
+ opts:["白","明","清","圆"],
+ full:"风高秋月白，\n雨霁晚霞红。",
+ exp:"秋风劲吹，月色清白；雨后初晴，晚霞映红。白与红（颜色对），秋月与晚霞（意象对）——《笠翁对韵》天韵最美的写景句！",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"雨霁晚霞",blank:"红",after:"",line2:"",
+ opts:["红","艳","明","彩"],
+ full:"风高秋月白，\n雨霁晚霞红。",
+ exp:"雨霁（雨后天晴），晚霞格外鲜红。白（冷色）对红（暖色），冷暖相衬，色彩极为生动。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"来鸿对",blank:"去燕",after:"",line2:"宿鸟对鸣虫",
+ opts:["去燕","归雁","远鹰","落雁"],
+ full:"来鸿对去燕，\n宿鸟对鸣虫。",
+ exp:"鸿雁北来，燕子南去，一来一去方向相对，都是迁徙的候鸟，自然界的对仗之美。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"宿鸟对",blank:"鸣虫",after:"",line2:"",
+ opts:["鸣虫","飞燕","游鱼","啼猿"],
+ full:"来鸿对去燕，\n宿鸟对鸣虫。",
+ exp:"宿鸟（归巢栖息的鸟）对鸣虫（夜里鸣叫的虫），静对动，归宿对鸣唱，是秋夜最生动的意象。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"三尺剑，",blank:"六钧弓",after:"",line2:"岭北对江东",
+ opts:["六钧弓","万斤锤","百步箭","千斤棒"],
+ full:"三尺剑，六钧弓，\n岭北对江东。",
+ exp:"三尺（剑长约三尺）对六钧（弓力六钧，一钧约十五斤）。数字相对，兵器相对，豪气干云！",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"岭北对",blank:"江东",after:"",line2:"",
+ opts:["江东","海西","山南","河北"],
+ full:"三尺剑，六钧弓，\n岭北对江东。",
+ exp:"岭北（山岭以北）对江东（江水以东），以山水为界的地理方位对，是古人常用的空间描述方式。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"人间",blank:"清暑殿",after:"",line2:"天上广寒宫",
+ opts:["清暑殿","避暑台","乘凉阁","消夏所"],
+ full:"人间清暑殿，\n天上广寒宫。",
+ exp:"人间的清暑殿（纳凉宫殿）对天上的广寒宫（月宫），人间对天上，建筑对建筑，暑对寒，温度也相对！",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"天上",blank:"广寒宫",after:"",line2:"",
+ opts:["广寒宫","明月宫","凌霄殿","紫微宫"],
+ full:"人间清暑殿，\n天上广寒宫。",
+ exp:"广寒宫是月亮上嫦娥居住的宫殿，「广寒」意为广阔寒冷。清暑殿对广寒宫，一暑一寒，人间对仙境，妙趣横生！",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"两岸晓烟杨柳",blank:"绿",after:"",line2:"一园春雨杏花红",
+ opts:["绿","青","长","新"],
+ full:"两岸晓烟杨柳绿，\n一园春雨杏花红。",
+ exp:"《笠翁对韵》最脍炙人口的名句！晨雾中杨柳碧绿，春雨里杏花粉红。绿与红（颜色对），柳与杏（植物对），晓烟与春雨（天气对）。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"一园春雨杏花",blank:"红",after:"",line2:"",
+ opts:["红","白","艳","开"],
+ full:"两岸晓烟杨柳绿，\n一园春雨杏花红。",
+ exp:"杏花开时白里透红，在春雨中格外娇艳。这一句与「杨柳绿」构成冷暖对比——绿色（冷）与红色（暖）交相辉映，是《笠翁对韵》的压卷之作。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"晨对",blank:"暮",after:"，下对上",line2:"树木对山川",
+ opts:["暮","夜","昏","午"],
+ full:"晨对暮，下对上，\n树木对山川。",
+ exp:"晨（早晨）与暮（傍晚）是一天的两端，上下是方向相对，树木对山川是自然景观相对——这是蒙学中最基础的三对对仗！",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"树木对",blank:"山川",after:"",line2:"",
+ opts:["山川","江河","大地","原野"],
+ full:"晨对暮，下对上，\n树木对山川。",
+ exp:"树木（植物景观）对山川（地理景观），类别相近，是典型的「正对」。蒙学从这类自然景物对仗入手，让孩子感受天地自然之美。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"春对夏，秋对",blank:"冬",after:"",line2:"暮鼓对晨钟",
+ opts:["冬","秋","年","节"],
+ full:"春对夏，秋对冬，\n暮鼓对晨钟。",
+ exp:"四季循环：春夏秋冬两两相对。暮鼓（傍晚寺庙击鼓）对晨钟（清晨寺庙敲钟），时间对时间，声音对声音。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"暮鼓对",blank:"晨钟",after:"",line2:"",
+ opts:["晨钟","朝鼓","晚鸟","早笛"],
+ full:"春对夏，秋对冬，\n暮鼓对晨钟。",
+ exp:"暮（黄昏）对晨（清晨），鼓对钟（乐器对），是古代城市和寺庙的报时方式。「暮鼓晨钟」后来成了提醒人珍惜时光的成语。",
+ src:"《笠翁对韵》卷一·冬韵"},
+
+{before:"牛女二星河",blank:"左右",after:"",line2:"参商两曜斗西东",
+ opts:["左右","东西","南北","两旁"],
+ full:"牛女二星河左右，\n参商两曜斗西东。",
+ exp:"牛郎星和织女星分列银河两岸（左右对西东），参星和商星此出彼没永不相见。星象对星象，七夕传说与天文知识的完美融合！",
+ src:"《笠翁对韵》卷一·天韵"},
+
+/* ── 第2关：江山如画（卷一·江韵、支韵、微韵）20题 ── */
+{before:"贫对富，塞对",blank:"通",after:"",line2:"野叟对溪童",
+ opts:["通","达","行","空"],
+ full:"贫对富，塞对通，\n野叟对溪童。",
+ exp:"贫与富（财富相对），塞与通（阻与畅相对）——这类反义词对仗叫「反对」，是对联中最整齐有力的形式。",
+ src:"《笠翁对韵》卷一·江韵"},
+
+{before:"野叟对",blank:"溪童",after:"",line2:"",
+ opts:["溪童","山翁","渔父","村妇"],
+ full:"贫对富，塞对通，\n野叟对溪童。",
+ exp:"野叟（野外的老翁）对溪童（溪边的孩童），老与幼相对，旷野与溪流场景相对——一幅田园山水的生动画面。",
+ src:"《笠翁对韵》卷一·江韵"},
+
+{before:"鸡声茅店",blank:"月",after:"",line2:"人迹板桥霜",
+ opts:["月","夜","寒","霜"],
+ full:"鸡声茅店月，\n人迹板桥霜。",
+ exp:"《笠翁对韵》最著名的写景绝对！鸡鸣声中，茅草小店，月光照耀；行人走过，木板小桥，白霜留印。画面感极强，化自温庭筠《商山早行》。",
+ src:"《笠翁对韵》卷一·江韵"},
+
+{before:"人迹板桥",blank:"霜",after:"",line2:"",
+ opts:["霜","雪","寒","冰"],
+ full:"鸡声茅店月，\n人迹板桥霜。",
+ exp:"板桥上白霜留着行人足迹，写出了清晨赶路的意境。「鸡声茅店月，人迹板桥霜」被誉为对联中写景的典范，每个字都是一幅画。",
+ src:"《笠翁对韵》卷一·江韵"},
+
+{before:"奇对偶，只对",blank:"双",after:"",line2:"汉祖对秦皇",
+ opts:["双","单","对","两"],
+ full:"奇对偶，只对双，\n汉祖对秦皇。",
+ exp:"奇（单数）对偶（双数），只（单个）对双（成对）——数字概念的对仗，有趣又整齐，是《笠翁对韵》支韵的精彩开篇！",
+ src:"《笠翁对韵》卷一·支韵"},
+
+{before:"汉祖对",blank:"秦皇",after:"",line2:"",
+ opts:["秦皇","唐宗","宋祖","周王"],
+ full:"奇对偶，只对双，\n汉祖对秦皇。",
+ exp:"汉祖（汉高祖刘邦，斩白蛇起义，建立汉朝）对秦皇（秦始皇嬴政，统一六国，书同文车同轨）——两位开创大一统王朝的帝王对仗。",
+ src:"《笠翁对韵》卷一·支韵"},
+
+{before:"参商两曜斗",blank:"西东",after:"",line2:"",
+ opts:["西东","南北","左右","上下"],
+ full:"牛女二星河左右，\n参商两曜斗西东。",
+ exp:"参（参星）与商（商星）永不相见——一个升起，另一个就落下。后来「参商」成了形容「永不相见」的典故，如「人生不相见，动如参与商」。",
+ src:"《笠翁对韵》卷一·天韵"},
+
+{before:"清对浊，美对",blank:"丑",after:"",line2:"",
+ opts:["丑","恶","陋","俗"],
+ full:"清对浊，美对丑，\n功过对是非。",
+ exp:"清与浊（水质相对），美与丑（外貌相对）——反义词对仗让孩子理解世界的对立统一。《笠翁对韵》常用这类简单鲜明的反义对，便于启蒙。",
+ src:"《笠翁对韵》卷一·尤韵"},
+
+{before:"功对过，善对",blank:"恶",after:"",line2:"",
+ opts:["恶","罪","丑","非"],
+ full:"功对过，善对恶，\n是非对曲直。",
+ exp:"功与过（成就与错误），善与恶（道德相对），是非对曲直——对联不只是文字游戏，这些词组蕴含了做人处世的基本道理。",
+ src:"蒙学经典对"},
+
+{before:"举头望",blank:"明月",after:"",line2:"低头思故乡",
+ opts:["明月","星辰","云端","苍天"],
+ full:"举头望明月，\n低头思故乡。",
+ exp:"李白《静夜思》！仰头望明月，低头思故乡——举/低（动作相反），望/思（感官对），明月/故乡（意象：月是思乡象征）。中国人最熟悉的思乡名句！",
+ src:"李白《静夜思》"},
+
+{before:"低头思",blank:"故乡",after:"",line2:"",
+ opts:["故乡","亲人","旧事","往日"],
+ full:"举头望明月，\n低头思故乡。",
+ exp:"月亮是中国文化中「思乡」的永恒象征。举头对低头（动作相反），明月对故乡（天上之物对心中之地）——两个简单动作，道尽离乡之情。",
+ src:"李白《静夜思》"},
+
+{before:"锄禾日当",blank:"午",after:"",line2:"汗滴禾下土",
+ opts:["午","中","晌","正"],
+ full:"锄禾日当午，\n汗滴禾下土。",
+ exp:"李绅《悯农》。正午烈日下锄地，汗水滴在庄稼脚下的泥土里。这首诗教会一代代孩子珍惜粮食，感恩农民的辛苦劳动。",
+ src:"李绅《悯农》"},
+
+{before:"汗滴禾下",blank:"土",after:"",line2:"",
+ opts:["土","地","泥","田"],
+ full:"锄禾日当午，\n汗滴禾下土。",
+ exp:"「午」与「土」押韵（同韵母），读来朗朗上口。土地是农民的根，每一粒粮食都是用汗水换来的——这是中国农耕文化最质朴的表达。",
+ src:"李绅《悯农》"},
+
+{before:"野旷天低",blank:"树",after:"",line2:"江清月近人",
+ opts:["树","山","云","草"],
+ full:"野旷天低树，\n江清月近人。",
+ exp:"孟浩然《宿建德江》。旷野中天比树还低（视觉），清澈的江水让月亮仿佛近在眼前（倒影）——写出了羁旅之夜的孤寂与辽阔。",
+ src:"孟浩然《宿建德江》"},
+
+{before:"江清月近",blank:"人",after:"",line2:"",
+ opts:["人","岸","船","心"],
+ full:"野旷天低树，\n江清月近人。",
+ exp:"月亮的倒影在清澈的江面上，仿佛伸手可及。「近人」二字写出了月光的温柔——越是孤独，月亮越是贴近。树对人（都是生命体），低对近（感官描述），妙！",
+ src:"孟浩然《宿建德江》"},
+
+{before:"日照香炉生",blank:"紫烟",after:"",line2:"遥看瀑布挂前川",
+ opts:["紫烟","白云","雾气","彩霞"],
+ full:"日照香炉生紫烟，\n遥看瀑布挂前川。",
+ exp:"李白《望庐山瀑布》！阳光照射庐山香炉峰，升起紫色云烟；远远望去，瀑布如同挂在山前的河流。「紫烟」是山中雾气在阳光下呈现的奇异颜色。",
+ src:"李白《望庐山瀑布》"},
+
+{before:"遥看瀑布挂",blank:"前川",after:"",line2:"",
+ opts:["前川","山间","崖边","石壁"],
+ full:"日照香炉生紫烟，\n遥看瀑布挂前川。",
+ exp:"「挂」字用得出神入化——把飞流直下的瀑布写成「挂」在山前的一条河流（前川），一个字写出了瀑布又高又直、一泻千里的气势。",
+ src:"李白《望庐山瀑布》"},
+
+{before:"春眠不觉",blank:"晓",after:"",line2:"处处闻啼鸟",
+ opts:["晓","早","明","天"],
+ full:"春眠不觉晓，\n处处闻啼鸟。",
+ exp:"孟浩然《春晓》！春天睡得太香，不知不觉天就亮了，到处都是鸟儿的叫声。语言简单却充满生机，是孩子最先学会的古诗之一，也是最美的春日记录。",
+ src:"孟浩然《春晓》"},
+
+{before:"处处闻",blank:"啼鸟",after:"",line2:"",
+ opts:["啼鸟","鸣虫","花香","春风"],
+ full:"春眠不觉晓，\n处处闻啼鸟。",
+ exp:"「处处」二字写出了鸟声无处不在，春天充满生机。「啼鸟」是古诗中春天的标志性意象——鸟鸣就是春天的音乐，唤醒沉睡的大地。",
+ src:"孟浩然《春晓》"},
+
+{before:"碧玉妆成一树",blank:"高",after:"",line2:"万条垂下绿丝绦",
+ opts:["高","绿","大","长"],
+ full:"碧玉妆成一树高，\n万条垂下绿丝绦。",
+ exp:"贺知章《咏柳》！碧玉（翡翠）般装扮的柳树高高矗立，万条柳枝垂下来像绿色的丝带（丝绦）——把柳树比作碧玉，极为形象，这是描写柳树最美的诗句！",
+ src:"贺知章《咏柳》"},
+
+/* ── 第3关：诗情画意（卷一·鱼虞齐佳灰真韵）20题 ── */
+{before:"绿水对",blank:"青山",after:"",line2:"",
+ opts:["青山","白云","碧海","苍穹"],
+ full:"绿水对青山，\n白雪对碧云。",
+ exp:"绿水青山是中国人最爱的山水意象。水往低处流（阴柔），山高耸入云（阳刚）——阴阳相对。「绿水青山就是金山银山」让这个古老对仗有了全新的时代意义！",
+ src:"蒙学经典对"},
+
+{before:"春风又绿",blank:"江南岸",after:"",line2:"明月何时照我还",
+ opts:["江南岸","两岸柳","千里地","万重山"],
+ full:"春风又绿江南岸，\n明月何时照我还。",
+ exp:"王安石《泊船瓜洲》。「绿」字用得出神入化——把形容词当动词用，春风把江南「染」成绿色！这是文学史上著名的「炼字」典故，王安石改了十多次才定下这个字。",
+ src:"王安石《泊船瓜洲》"},
+
+{before:"明月何时照我",blank:"还",after:"",line2:"",
+ opts:["还","归","回","来"],
+ full:"春风又绿江南岸，\n明月何时照我还。",
+ exp:"还，读huán，归来之意。作者问明月：何时才能照着我回到故乡？「绿」（动态变化）对「还」（归乡愿望），一个写景，一个抒情，合成了绝妙的思乡名句。",
+ src:"王安石《泊船瓜洲》"},
+
+{before:"欲穷千里目，更上",blank:"一层楼",after:"",line2:"",
+ opts:["一层楼","高处去","顶峰上","云端处"],
+ full:"欲穷千里目，\n更上一层楼。",
+ exp:"王之涣《登鹳雀楼》！想看到更远的地方，就要再爬高一层——这句话超越了写景，成为激励人不断进取的千古哲理：登高才能望远，努力才能看得更远！",
+ src:"王之涣《登鹳雀楼》"},
+
+{before:"会当凌绝顶，一览众山",blank:"小",after:"",line2:"",
+ opts:["小","矮","低","远"],
+ full:"会当凌绝顶，\n一览众山小。",
+ exp:"杜甫《望岳》！登上泰山绝顶，俯瞰所有山峰都显得矮小——终将登上顶峰，俯瞰万山。这是中国诗歌中最有气魄的豪迈宣言，激励着一代代人不畏困难、勇攀高峰！",
+ src:"杜甫《望岳》"},
+
+{before:"海内存知己，天涯若",blank:"比邻",after:"",line2:"",
+ opts:["比邻","咫尺","眼前","身旁"],
+ full:"海内存知己，\n天涯若比邻。",
+ exp:"王勃《送杜少府之任蜀州》千古名句！只要天下有知心朋友，就算远在天边也像邻居一样亲近。这句话改变了送别诗的伤感基调，充满豁达的人生气度！",
+ src:"王勃《送杜少府之任蜀州》"},
+
+{before:"无边落木萧萧",blank:"下",after:"",line2:"不尽长江滚滚来",
+ opts:["下","落","飘","散"],
+ full:"无边落木萧萧下，\n不尽长江滚滚来。",
+ exp:"杜甫《登高》！落叶无边际地飘落，长江无尽头地奔涌——「萧萧下」对「滚滚来」，叠字相对，气势磅礴。这首诗被誉为「古今七律第一」！",
+ src:"杜甫《登高》"},
+
+{before:"不尽长江滚滚",blank:"来",after:"",line2:"",
+ opts:["来","奔","涌","流"],
+ full:"无边落木萧萧下，\n不尽长江滚滚来。",
+ exp:"下与来（动词方向相对），萧萧（落叶声）与滚滚（江水势），叠字巧妙相对。一个向下（叶落），一个向前（江来），时间流逝与历史长河的双重意象叠加。",
+ src:"杜甫《登高》"},
+
+{before:"接天莲叶无穷",blank:"碧",after:"",line2:"映日荷花别样红",
+ opts:["碧","绿","青","翠"],
+ full:"接天莲叶无穷碧，\n映日荷花别样红。",
+ exp:"杨万里《晓出净慈寺送林子方》！莲叶连接天际无边碧绿，荷花在阳光映照下格外鲜红。碧与红（颜色对），无穷对别样（程度修饰对），是写西湖夏日最美的诗句！",
+ src:"杨万里《晓出净慈寺送林子方》"},
+
+{before:"映日荷花别样",blank:"红",after:"",line2:"",
+ opts:["红","艳","美","香"],
+ full:"接天莲叶无穷碧，\n映日荷花别样红。",
+ exp:"「别样红」——特别地红，与众不同地红！碧（冷绿）对红（暖红），构成视觉上最强烈的色彩对比，是《笠翁对韵》颜色对仗的最高示范。",
+ src:"杨万里《晓出净慈寺送林子方》"},
+
+{before:"山重水复疑无路，柳暗花明",blank:"又一村",after:"",line2:"",
+ opts:["又一村","景更新","路更宽","春色来"],
+ full:"山重水复疑无路，\n柳暗花明又一村。",
+ exp:"陆游《游山西村》！山重叠水交错，以为无路可走，转角处柳暗花明，又出现一个村庄。「山重水复」对「柳暗花明」——困境与转机的完美对仗，成为绝处逢生的千古名句！",
+ src:"陆游《游山西村》"},
+
+{before:"采菊东篱下，悠然见",blank:"南山",after:"",line2:"",
+ opts:["南山","远山","青山","云山"],
+ full:"采菊东篱下，\n悠然见南山。",
+ exp:"陶渊明《饮酒》！在东边篱笆下采菊花，悠然地抬头看见了南山。菊花、东篱、南山，构成了中国历史上最著名的隐居意象——超然物外，怡然自得。",
+ src:"陶渊明《饮酒》"},
+
+{before:"不识庐山真面目，只缘身在",blank:"此山中",after:"",line2:"",
+ opts:["此山中","云雾里","山顶上","深处处"],
+ full:"不识庐山真面目，\n只缘身在此山中。",
+ exp:"苏轼《题西林壁》！看不清庐山真面目，是因为自己就在山里。这句诗成了「当局者迷，旁观者清」的最佳诠释——只有跳出来，才能看清全局！",
+ src:"苏轼《题西林壁》"},
+
+{before:"横看成岭侧成",blank:"峰",after:"",line2:"远近高低各不同",
+ opts:["峰","山","崖","坡"],
+ full:"横看成岭侧成峰，\n远近高低各不同。",
+ exp:"苏轼《题西林壁》！从横面看是绵延的山岭，从侧面看是高耸的山峰——同一座庐山，角度不同，看到的完全不同。这是关于「视角」与「认知」的哲学对仗。",
+ src:"苏轼《题西林壁》"},
+
+{before:"烽火连三月，家书抵",blank:"万金",after:"",line2:"",
+ opts:["万金","千金","百两","千两"],
+ full:"烽火连三月，\n家书抵万金。",
+ exp:"杜甫《春望》。战乱持续三个月（烽火连三月），一封家信价值万两黄金（家书抵万金）——数字夸张对比，写出了战争中对家人音讯的极度渴望，令人动容。",
+ src:"杜甫《春望》"},
+
+{before:"黑发不知勤学早，白首方悔",blank:"读书迟",after:"",line2:"",
+ opts:["读书迟","用功迟","学习迟","求知迟"],
+ full:"黑发不知勤学早，\n白首方悔读书迟。",
+ exp:"颜真卿《劝学》！年轻时不知道勤奋学习，老了才后悔读书太少。黑发对白首（颜色+年龄相对），早对迟（时间相对）——珍惜时光，趁年少好好学习！",
+ src:"颜真卿《劝学》"},
+
+{before:"三更灯火五更",blank:"鸡",after:"",line2:"正是男儿读书时",
+ opts:["鸡","鸣","晓","天"],
+ full:"三更灯火五更鸡，\n正是男儿读书时。",
+ exp:"颜真卿《劝学》！三更（半夜）还在灯下苦读，五更（凌晨）听鸡叫就起床——这才是读书的时候！三更对五更（时辰相对），灯火对鸡鸣（意象相对），励志名句！",
+ src:"颜真卿《劝学》"},
+
+{before:"少壮不努力，老大徒",blank:"伤悲",after:"",line2:"",
+ opts:["伤悲","悲哀","叹息","后悔"],
+ full:"少壮不努力，\n老大徒伤悲。",
+ exp:"《汉乐府·长歌行》！年轻力壮时不努力，年老只能白白悲伤。少壮对老大（年龄相对），努力对伤悲（行为与结果相对）。这是中国孩子从小必背的劝学名句！",
+ src:"《汉乐府·长歌行》"},
+
+{before:"花开红树乱莺",blank:"啼",after:"",line2:"草长平湖白鹭飞",
+ opts:["啼","鸣","叫","声"],
+ full:"花开红树乱莺啼，\n草长平湖白鹭飞。",
+ exp:"徐元杰《湖上》！红树中莺声嘈杂（乱啼），平湖上白鹭翩飞——「乱」写出热闹，「飞」写出轻盈，一静一动，色彩与声音的双重对仗，春日生机跃然纸上！",
+ src:"徐元杰《湖上》"},
+
+/* ── 第4关：风雅颂章（卷一末·文元寒删韵 + 卷二）20题 ── */
+{before:"春色满园关不",blank:"住",after:"",line2:"一枝红杏出墙来",
+ opts:["住","了","去","得"],
+ full:"春色满园关不住，\n一枝红杏出墙来。",
+ exp:"叶绍翁《游园不值》！春天的美景关不住，一枝红杏从高墙探出头来——关不住的生命力！「春色满园」对「一枝红杏」，面对点，整体对局部，构思精妙。",
+ src:"叶绍翁《游园不值》"},
+
+{before:"两个黄鹂鸣翠",blank:"柳",after:"",line2:"一行白鹭上青天",
+ opts:["柳","树","枝","岸"],
+ full:"两个黄鹂鸣翠柳，\n一行白鹭上青天。",
+ exp:"杜甫《绝句》！两只黄鹂在翠绿柳树上鸣叫，一排白鹭飞上蔚蓝天空。黄+翠（暖色调）对白+青（冷色调），鸣（声）对上（动），低处对高处——绝妙的色彩与空间对仗！",
+ src:"杜甫《绝句》"},
+
+{before:"一行白鹭上",blank:"青天",after:"",line2:"",
+ opts:["青天","蓝天","云端","高空"],
+ full:"两个黄鹂鸣翠柳，\n一行白鹭上青天。",
+ exp:"黄鹂对白鹭（鸟相对），翠柳对青天（颜色相近意象不同），鸣对上（动词对），低处对高处——这首诗是学习对联的绝佳范例，每句都是一幅工整的春日画卷！",
+ src:"杜甫《绝句》"},
+
+{before:"竹外桃花三两",blank:"枝",after:"",line2:"春江水暖鸭先知",
+ opts:["枝","朵","开","发"],
+ full:"竹外桃花三两枝，\n春江水暖鸭先知。",
+ exp:"苏轼《惠崇春江晚景》！竹林外探出三两枝桃花，春天的江水刚刚变暖，鸭子最先感觉到了——不是宏大的春景，而是最细腻的早春感受，观察入微！",
+ src:"苏轼《惠崇春江晚景》"},
+
+{before:"春江水暖鸭",blank:"先知",after:"",line2:"",
+ opts:["先知","最知","早知","初知"],
+ full:"竹外桃花三两枝，\n春江水暖鸭先知。",
+ exp:"鸭子整天在水里，所以最先感知水温变化——生动有趣！「先知」二字点睛，既写实（鸭子真的先知道），又有哲理（亲身实践者最先感知变化）。",
+ src:"苏轼《惠崇春江晚景》"},
+
+{before:"等闲识得东风",blank:"面",after:"",line2:"万紫千红总是春",
+ opts:["面","来","意","至"],
+ full:"等闲识得东风面，\n万紫千红总是春。",
+ exp:"朱熹《春日》！轻易就能认出春风的面貌，因为万紫千红的花都是春天的作品。东风代表春天，万紫千红是春天的色彩——春天就是五彩缤纷！",
+ src:"朱熹《春日》"},
+
+{before:"万紫千红总是",blank:"春",after:"",line2:"",
+ opts:["春","美","好","新"],
+ full:"等闲识得东风面，\n万紫千红总是春。",
+ exp:"「万紫千红」——百花盛开、五彩缤纷，后来成了形容繁荣美好的成语。朱熹既写春景，也寓意读书学习带来的精神愉悦——知识就像春天，让人心中万紫千红！",
+ src:"朱熹《春日》"},
+
+{before:"停车坐爱枫林",blank:"晚",after:"",line2:"霜叶红于二月花",
+ opts:["晚","美","红","深"],
+ full:"停车坐爱枫林晚，\n霜叶红于二月花。",
+ exp:"杜牧《山行》！停车是因为太爱这傍晚的枫林了——经霜的红叶比二月春花还要红艳！这首诗改变了中国人对秋天的看法：秋天未必悲凉，霜叶的红比春花更美！",
+ src:"杜牧《山行》"},
+
+{before:"霜叶红于",blank:"二月花",after:"",line2:"",
+ opts:["二月花","春时花","桃李花","三月花"],
+ full:"停车坐爱枫林晚，\n霜叶红于二月花。",
+ exp:"经过霜打的枫叶比二月盛开的春花还红！这是中国诗歌中最惊艳的比较——秋天的枫叶战胜了春天的鲜花。杜牧以此表达越挫越勇、越磨砺越美丽的人生态度！",
+ src:"杜牧《山行》"},
+
+{before:"故人西辞黄鹤",blank:"楼",after:"",line2:"烟花三月下扬州",
+ opts:["楼","台","峰","处"],
+ full:"故人西辞黄鹤楼，\n烟花三月下扬州。",
+ exp:"李白《黄鹤楼送孟浩然之广陵》！老朋友从黄鹤楼出发，在烟花三月飘然去了扬州。黄鹤楼（武汉）与扬州都是古代最繁华之地，这是充满浪漫气息的送别诗！",
+ src:"李白《黄鹤楼送孟浩然之广陵》"},
+
+{before:"烟花三月下",blank:"扬州",after:"",line2:"",
+ opts:["扬州","江南","金陵","苏州"],
+ full:"故人西辞黄鹤楼，\n烟花三月下扬州。",
+ exp:"「烟花三月」——如烟如花的三月春景，极为美丽。下扬州是顺流而下去扬州。这句诗让「烟花三月」成为描述春天最美的词语，令扬州成为无数人心中的春日圣地！",
+ src:"李白《黄鹤楼送孟浩然之广陵》"},
+
+{before:"大漠孤烟",blank:"直",after:"",line2:"长河落日圆",
+ opts:["直","升","起","高"],
+ full:"大漠孤烟直，\n长河落日圆。",
+ exp:"王维《使至塞上》！大沙漠中一缕炊烟笔直升起，黄河上一轮落日正圆——直与圆（形状相对），孤烟与落日（意象相对），写出了大漠的苍茫壮阔！王国维称之「千古壮观」。",
+ src:"王维《使至塞上》"},
+
+{before:"长河落日",blank:"圆",after:"",line2:"",
+ opts:["圆","红","大","沉"],
+ full:"大漠孤烟直，\n长河落日圆。",
+ exp:"直（线形）对圆（弧形）——两个形容形状的字，一是烟的笔直，一是太阳的浑圆，视觉对比极为强烈。孤烟（渺小）对落日（宏大），以小衬大，壮美无边！",
+ src:"王维《使至塞上》"},
+
+{before:"问渠那得清如许，为有",blank:"源头活水来",after:"",line2:"",
+ opts:["源头活水来","清泉石上流","春风送暖来","活水自天来"],
+ full:"问渠那得清如许，\n为有源头活水来。",
+ exp:"朱熹《观书有感》！问水池为何这么清澈？因为有源头活水不断流来。这是一个深刻的哲理对仗：人要不断读书学习，才能保持思想的新鲜活跃，不能自满停滞！",
+ src:"朱熹《观书有感》"},
+
+{before:"读书破万",blank:"卷",after:"",line2:"下笔如有神",
+ opts:["卷","册","页","篇"],
+ full:"读书破万卷，\n下笔如有神。",
+ exp:"杜甫《奉赠韦左丞丈二十二韵》！读书读破了一万卷（博览群书），写文章时下笔就像有神助一样。「破」字用得极妙——书被翻烂了，才叫真正读懂了！告诉我们：大量阅读是写作的根本！",
+ src:"杜甫《奉赠韦左丞丈》"},
+
+{before:"长风破浪会有",blank:"时",after:"",line2:"直挂云帆济沧海",
+ opts:["时","日","期","刻"],
+ full:"长风破浪会有时，\n直挂云帆济沧海。",
+ exp:"李白《行路难》！乘风破浪的机会终将到来，到那时就扬帆渡过大海——即使眼前再艰难，也要相信终会成功的那一天。这是中国文化中对困境最豪迈的回应！",
+ src:"李白《行路难》"},
+
+{before:"直挂云帆济",blank:"沧海",after:"",line2:"",
+ opts:["沧海","碧海","大海","汪洋"],
+ full:"长风破浪会有时，\n直挂云帆济沧海。",
+ exp:"「沧海」是古人对大海的诗意称呼（青苍色的大海）。时（时机）对沧海（目标），会有（终将来到）对济（终将渡过）——相信自己，乘风破浪，终达彼岸！",
+ src:"李白《行路难》"},
+
+{before:"劝君更尽一杯酒，西出阳关",blank:"无故人",after:"",line2:"",
+ opts:["无故人","路更长","万里行","难相逢"],
+ full:"劝君更尽一杯酒，\n西出阳关无故人。",
+ exp:"王维《送元二使安西》！劝朋友再干一杯酒，出了阳关往西去，就再也没有老朋友了。这首诗被谱成「阳关三叠」，千百年来唱哭了无数离别之人，是古代送别诗的巅峰之作！",
+ src:"王维《送元二使安西》"},
+
+/* ── 第5关：千古绝对（卷二·阳庚尤侵覃盐咸韵 + 历代绝句）20题 ── */
+{before:"孤帆远影碧空",blank:"尽",after:"",line2:"唯见长江天际流",
+ opts:["尽","去","远","消"],
+ full:"孤帆远影碧空尽，\n唯见长江天际流。",
+ exp:"李白《黄鹤楼送孟浩然之广陵》后两句！孤船远去，影子消失在碧空尽头；只见长江水向天边流去。目送远去的帆影，直到消失不见，是中国诗歌中最感人的送别画面！",
+ src:"李白《黄鹤楼送孟浩然之广陵》"},
+
+{before:"白日依山",blank:"尽",after:"",line2:"黄河入海流",
+ opts:["尽","沉","落","去"],
+ full:"白日依山尽，\n黄河入海流。",
+ exp:"王之涣《登鹳雀楼》！太阳依傍山峦渐渐西沉，黄河奔流向大海汇去。日落山（由高到低）对河入海（由小到大），一静一动，时间与空间的双重壮阔——中国古诗中最大气的写景对！",
+ src:"王之涣《登鹳雀楼》"},
+
+{before:"黄河入海",blank:"流",after:"",line2:"",
+ opts:["流","去","奔","行"],
+ full:"白日依山尽，\n黄河入海流。",
+ exp:"尽（结束、消失）对流（流动、延续）——太阳落山是结束，黄河入海是归宿。有限的时间（夕阳），无限的空间（大河），让人感到宇宙的壮阔与生命的渺小，又充满力量。",
+ src:"王之涣《登鹳雀楼》"},
+
+{before:"海上生明月，天涯共此",blank:"时",after:"",line2:"",
+ opts:["时","刻","宵","夜"],
+ full:"海上生明月，\n天涯共此时。",
+ exp:"张九龄《望月怀远》！大海上升起明月，天涯两端的人共在此刻同赏这轮月。「共此时」三字道出了思念的本质：距离再远，只要同一刻抬头看月，就是团圆——中秋节最深刻的哲学！",
+ src:"张九龄《望月怀远》"},
+
+{before:"但愿人长久，千里共",blank:"婵娟",after:"",line2:"",
+ opts:["婵娟","明月","此刻","团圆"],
+ full:"但愿人长久，\n千里共婵娟。",
+ exp:"苏轼《水调歌头》！希望人人平安长久，就算相隔千里，也能共享这轮明月（婵娟是月亮的雅称）。这是中秋节最著名的祝福，也是中国人对「分离」最美的安慰！",
+ src:"苏轼《水调歌头》"},
+
+{before:"春蚕到死丝方",blank:"尽",after:"",line2:"蜡炬成灰泪始干",
+ opts:["尽","断","止","完"],
+ full:"春蚕到死丝方尽，\n蜡炬成灰泪始干。",
+ exp:"李商隐《无题》！春蚕直到死才把丝吐完，蜡烛烧成灰才让泪滴干。「丝」与「思」谐音，写尽了至死不渝的深情。后来常用来赞美老师的无私奉献——燃烧自己，照亮他人！",
+ src:"李商隐《无题》"},
+
+{before:"蜡炬成灰泪始",blank:"干",after:"",line2:"",
+ opts:["干","尽","止","完"],
+ full:"春蚕到死丝方尽，\n蜡炬成灰泪始干。",
+ exp:"尽（丝吐尽）对干（泪流干），到死对成灰——都是以生命的终结来写爱的坚贞。一个用蚕（有生命的）比喻，一个用蜡烛（无生命的）比喻，两相对照，双重感动！",
+ src:"李商隐《无题》"},
+
+{before:"沉舟侧畔千帆",blank:"过",after:"",line2:"病树前头万木春",
+ opts:["过","行","来","驶"],
+ full:"沉舟侧畔千帆过，\n病树前头万木春。",
+ exp:"刘禹锡《酬乐天扬州初逢席上见赠》！沉船旁边千帆竞过，病树前头万木逢春——这是中国文化中最积极的辩证思想：失败不是终点，新的力量已经在旁边蓬勃生长！",
+ src:"刘禹锡《酬乐天扬州初逢席上见赠》"},
+
+{before:"病树前头万木",blank:"春",after:"",line2:"",
+ opts:["春","发","新","荣"],
+ full:"沉舟侧畔千帆过，\n病树前头万木春。",
+ exp:"沉舟对病树（衰败意象），千帆对万木（新生意象），过对春（动词/名词各异），深刻揭示：新事物必然代替旧事物，失败者的身旁就是成功者的起点！",
+ src:"刘禹锡《酬乐天扬州初逢席上见赠》"},
+
+{before:"举杯邀明月，对影成",blank:"三人",after:"",line2:"",
+ opts:["三人","双人","佳人","数人"],
+ full:"举杯邀明月，\n对影成三人。",
+ exp:"李白《月下独酌》！举起酒杯邀明月，月光下影子一摇，竟成了三个人（我、月亮、影子）。独饮者用想象力创造了同伴——这是中国文学中最孤独又最浪漫的意境！",
+ src:"李白《月下独酌》"},
+
+{before:"独在异乡为异客，每逢佳节倍",blank:"思亲",after:"",line2:"",
+ opts:["思亲","伤心","动情","念家"],
+ full:"独在异乡为异客，\n每逢佳节倍思亲。",
+ exp:"王维《九月九日忆山东兄弟》！在他乡独自漂泊，每当节日来临就加倍思念亲人。两个「异」字（异乡/异客）强调了漂泊感，「倍思亲」道出了中国人节日情感的本质——越是过节越想家！",
+ src:"王维《九月九日忆山东兄弟》"},
+
+{before:"本是同根生，相煎何太",blank:"急",after:"",line2:"",
+ opts:["急","甚","忙","深"],
+ full:"本是同根生，\n相煎何太急。",
+ exp:"曹植《七步诗》！豆萁（豆茎）在锅下燃烧，把同是一根生的豆子煮得哭泣。曹植用此诗暗讽哥哥曹丕逼迫自己——同根对同室，煎对煮，手足相残的悲剧永恒警示！",
+ src:"曹植《七步诗》"},
+
+{before:"千里莺啼绿映",blank:"红",after:"",line2:"水村山郭酒旗风",
+ opts:["红","色","花","彩"],
+ full:"千里莺啼绿映红，\n水村山郭酒旗风。",
+ exp:"杜牧《江南春》！千里江南，莺声啼叫，绿叶映衬红花——「绿映红」写出春天最典型的色彩。水村（水边村）对山郭（山旁城），自然对人文，动态对静态，江南春日尽收眼底！",
+ src:"杜牧《江南春》"},
+
+{before:"旧时王谢堂前燕，飞入寻常百姓",blank:"家",after:"",line2:"",
+ opts:["家","户","门","院"],
+ full:"旧时王谢堂前燕，\n飞入寻常百姓家。",
+ exp:"刘禹锡《乌衣巷》！当年王导、谢安豪门大宅前的燕子，如今飞进了普通百姓家里——王谢豪族已灰飞烟灭，连燕子都找不到旧主人了。这两句感慨历史沧桑，震撼人心！",
+ src:"刘禹锡《乌衣巷》"},
+
+{before:"欲把西湖比西子，淡妆浓抹总",blank:"相宜",after:"",line2:"",
+ opts:["相宜","适合","好看","相称"],
+ full:"欲把西湖比西子，\n淡妆浓抹总相宜。",
+ exp:"苏轼《饮湖上初晴后雨》！把西湖比作西施（古代四大美人之一），不管淡妆还是浓抹都恰到好处。这个比喻让西湖有了「西子湖」的雅名，是中国历史上最著名的湖泊比喻！",
+ src:"苏轼《饮湖上初晴后雨》"},
+
+{before:"人生自古谁无",blank:"死",after:"",line2:"留取丹心照汗青",
+ opts:["死","别","亡","终"],
+ full:"人生自古谁无死，\n留取丹心照汗青。",
+ exp:"文天祥《过零丁洋》！自古以来人终有一死，但要留下一片赤胆忠心照耀史册（汗青指竹简史书）。文天祥宁死不降，以此诗明志，成为千古英雄——这是中华民族精神的最强音！",
+ src:"文天祥《过零丁洋》"},
+
+{before:"留取丹心照",blank:"汗青",after:"",line2:"",
+ opts:["汗青","史册","后人","千秋"],
+ full:"人生自古谁无死，\n留取丹心照汗青。",
+ exp:"汗青，是古代用竹简制书时烤干水分（汗）的过程，后指史书。死与汗青（生命终结对历史永存），无与照（虚无对光辉），留丹心照汗青——生命有限，精神永存！",
+ src:"文天祥《过零丁洋》"},
+
+{before:"黄沙百战穿金",blank:"甲",after:"",line2:"不破楼兰终不还",
+ opts:["甲","衣","袍","铠"],
+ full:"黄沙百战穿金甲，\n不破楼兰终不还。",
+ exp:"王昌龄《从军行》！在黄沙漫漫的战场上经历百次战斗，铠甲都磨穿了；不攻破敌国誓死不回还！百战对终还（战斗历程对誓言），穿金甲（磨损至极）对不还（决心至坚），是边塞诗中最慷慨激昂的豪言！",
+ src:"王昌龄《从军行》"},
+
+{before:"不破楼兰终不",blank:"还",after:"",line2:"",
+ opts:["还","归","回","来"],
+ full:"黄沙百战穿金甲，\n不破楼兰终不还。",
+ exp:"「终不还」三字，是战士最铿锵有力的誓言——不完成任务绝不回头！穿（磨穿）对还（归还），金甲（物质的损耗）对誓言（精神的坚守），是中国古代军人气节的最佳写照！",
+ src:"王昌龄《从军行》"}
+
+,
+{before:"春夜喜雨知时",blank:"节",after:"",line2:"当春乃发生",
+ opts:["节","候","令","序"],
+ full:"春夜喜雨知时节，\n当春乃发生。",
+ exp:"杜甫《春夜喜雨》！春雨懂得时节，到了该下的时候就悄悄降临。知时节三字赋予春雨以灵性——仿佛春雨有智慧，知道万物正需要它的滋润。",
+ src:"杜甫《春夜喜雨》"},
+
+{before:"随风潜入夜，润物细无",blank:"声",after:"",line2:"",
+ opts:["声","痕","迹","形"],
+ full:"随风潜入夜，\n润物细无声。",
+ exp:"杜甫《春夜喜雨》！春雨跟随着春风悄悄地在夜里降落，轻柔地滋润万物而没有一点声音。细无声三字是对无私奉献的最美描述——默默付出，不求回报，如同师恩！",
+ src:"杜甫《春夜喜雨》"},
+
+{before:"忽如一夜春风来，千树万树",blank:"梨花开",after:"",line2:"",
+ opts:["梨花开","雪花飘","桃花艳","杏花红"],
+ full:"忽如一夜春风来，\n千树万树梨花开。",
+ exp:"岑参《白雪歌送武判官归京》！一夜之间千树万树的雪花像梨花盛开——把大雪比作梨花，以春比冬，把严寒化为春日美景！这是中国古诗中最浪漫的比喻！",
+ src:"岑参《白雪歌送武判官归京》"},
+
+{before:"欲将轻骑逐，大雪满弓",blank:"刀",after:"",line2:"",
+ opts:["刀","枪","弦","箭"],
+ full:"欲将轻骑逐，\n大雪满弓刀。",
+ exp:"卢纶《塞下曲》！想率领轻骑追赶敌人，大雪却铺满了弓箭和刀枪——诗末才点出是雪夜！前面紧张的追击，原来在大雪中进行，留下悬念，余味无穷！",
+ src:"卢纶《塞下曲》"}
+]; /* DB end */
+
+/* ============================================================
+   关卡定义
+============================================================ */
+var LEVELS = [
+  {id:1, name:"天地初开", sub:"卷一·天韵、冬韵", icon:"☀️",
+   color:"var(--red)", desc:"《笠翁对韵》最经典的开篇对句，学对联从这里起步！",
+   range:[0,20]},
+  {id:2, name:"江山如画", sub:"卷一·江韵、支韵 + 唐诗启蒙", icon:"🌸",
+   color:"#d06020", desc:"走进山水田园，从江韵、支韵到唐诗经典，诗情画意！",
+   range:[20,40]},
+  {id:3, name:"诗情画意", sub:"卷一·鱼虞齐佳灰真韵 + 宋诗", icon:"🏔️",
+   color:"var(--green)", desc:"唐宋名句大荟萃，从登高壮志到思乡柔情，触类旁通！",
+   range:[40,60]},
+  {id:4, name:"风雅颂章", sub:"卷一末·文元寒删 + 卷二前段", icon:"📜",
+   color:"var(--blue)", desc:"《笠翁对韵》卷一结篇精华，配合宋诗哲理名句，文采飞扬！",
+   range:[60,80]},
+  {id:5, name:"千古绝对", sub:"卷二·阳庚尤侵覃盐咸韵", icon:"🏆",
+   color:"var(--purple)", desc:"挑战最难经典绝句！能全过关者，方可称「对联状元」！",
+   range:[80,100]}
+];
+
+/* ============================================================
+   进度存储
+============================================================ */
+var SAVE_KEY = 'duizi_v3_progress';
+function loadProgress(){
+  try{
+    var raw = localStorage.getItem(SAVE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {unlocked:1, stars:{}, scores:{}};
+}
+function saveProgress(p){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(p)); }catch(e){}
+}
+var PROG = loadProgress();
+
+/* ============================================================
+   STATE
+============================================================ */
+var G = {
+  lvIdx:0,       // 0-based level index
+  questions:[],  // shuffled question array for this level
+  cur:0,
+  score:0,
+  streak:0,
+  maxStreak:0,
+  answered:false,
+  history:[]
+};
+
+/* ============================================================
+   TTS
+============================================================ */
+var _ttsVoice=null, _ttsPending='';
+function _initTTS(){
+  if(!window.speechSynthesis) return;
+  function pick(){
+    var vs=window.speechSynthesis.getVoices();
+    if(!vs.length) return;
+    var order=['zh-TW','zh_TW','zh-CN','zh_CN','zh-HK','zh'];
+    for(var k=0;k<order.length;k++){
+      var f=vs.filter(function(v){return v.lang.indexOf(order[k])===0;});
+      if(f.length){_ttsVoice=f[0];break;}
+    }
+    if(!_ttsVoice) _ttsVoice=vs.find(function(v){return /zh/i.test(v.lang);})||null;
+  }
+  pick();
+  if(typeof window.speechSynthesis.onvoiceschanged!=='undefined')
+    window.speechSynthesis.onvoiceschanged=pick;
+}
+function _speakNow(text){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var clean=text.replace(/\n/g,'，');
+  var utt=new SpeechSynthesisUtterance(clean);
+  utt.lang='zh-CN'; utt.rate=0.80; utt.pitch=1.45;
+  if(_ttsVoice) utt.voice=_ttsVoice;
+  var btn=document.getElementById('speak-btn');
+  function done(){if(btn)btn.classList.remove('speaking');}
+  utt.onend=done; utt.onerror=done;
+  if(btn) btn.classList.add('speaking');
+  window.speechSynthesis.speak(utt);
+}
+function speakCouplet(text){
+  _ttsPending=text;
+  if(_ttsVoice||!window.speechSynthesis){_speakNow(text);return;}
+  var tries=0,timer=setInterval(function(){
+    tries++;
+    if(window.speechSynthesis.getVoices().length||tries>8){
+      clearInterval(timer);_initTTS();_speakNow(_ttsPending);
+    }
+  },100);
+}
+function replaySpeak(){if(_ttsPending)_speakNow(_ttsPending);}
+
+/* ============================================================
+   UTILS
+============================================================ */
+function el(id){return document.getElementById(id);}
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  el(id).classList.add('active'); window.scrollTo(0,0);
+}
+function shuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;
+  }
+  return a;
+}
+function escH(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function starsFor(score,max){
+  var p=score/max;
+  if(p>=0.9) return 3;
+  if(p>=0.7) return 2;
+  if(p>=0.45) return 1;
+  return 0;
+}
+function starStr(n){ return '⭐'.repeat(n)+('☆'.repeat(3-n)); }
+
+/* ============================================================
+   RANK
+============================================================ */
+function rank(pct){
+  if(pct>=0.95) return {t:'状元',d:'才绝天下，对联宗师！',icon:'🏆'};
+  if(pct>=0.85) return {t:'榜眼',d:'学富五车，差一步登顶！',icon:'🥈'};
+  if(pct>=0.72) return {t:'探花',d:'满腹经纶，实属佳才！',icon:'🥉'};
+  if(pct>=0.58) return {t:'进士',d:'根基扎实，前途无量！',icon:'📜'};
+  if(pct>=0.42) return {t:'举人',d:'初显才华，继续努力！',icon:'📚'};
+  if(pct>=0.25) return {t:'秀才',d:'略有根基，多读经典！',icon:'✏️'};
+  return              {t:'童生',d:'万里路从脚下起，加油！',icon:'🌱'};
+}
+
+/* ============================================================
+   MAP SCREEN
+============================================================ */
+function renderMap(){
+  var grid=el('level-grid');
+  grid.innerHTML='';
+  LEVELS.forEach(function(lv,i){
+    var unlocked=(i+1)<=PROG.unlocked;
+    var stars=PROG.stars[i+1]||0;
+    var score=PROG.scores[i+1]||0;
+    var div=document.createElement('div');
+    div.className='lv-card '+(unlocked?'unlocked':'locked');
+    var pctTxt=unlocked&&score>0 ? Math.round(score/100*5)+'/5分×4+连击':'';
+    div.innerHTML=
+      '<div class="lv-icon">'+lv.icon+'</div>'+
+      '<div class="lv-body">'+
+        '<div class="lv-name">第'+['一','二','三','四','五'][i]+'关·'+lv.name+'</div>'+
+        '<div class="lv-sub">'+escH(lv.sub)+'</div>'+
+      '</div>'+
+      '<div class="lv-right">'+
+        (unlocked
+          ? '<div class="lv-stars">'+starStr(stars)+'</div>'+
+            '<div class="lv-pct">'+(score>0?score+'分':'未挑战')+'</div>'
+          : '<div class="lock-icon">🔒</div>'
+        )+
+      '</div>';
+    if(unlocked){
+      div.addEventListener('click',function(){startLevel(i);});
+    }
+    grid.appendChild(div);
+  });
+}
+
+/* ============================================================
+   GAME FLOW
+============================================================ */
+function startLevel(lvIdx){
+  var lv=LEVELS[lvIdx];
+  G.lvIdx=lvIdx; G.cur=0; G.score=0; G.streak=0; G.maxStreak=0;
+  G.answered=false; G.history=[];
+  G.questions=shuffle(DB.slice(lv.range[0], lv.range[1]));
+  loadQ();
+  show('game-screen');
+}
+
+
+/* derive partner line from full couplet when line2 is empty */
+function getHint(q){
+  // If the question line already embeds both parts (long after), no extra hint needed
+  if(Array.from(q.after).length >= 4) return null;
+  if(q.line2) return {text:q.line2, tag:'', auto:false};
+  var lines = q.full.split('\n')
+    .map(function(l){return l.trim().replace(/[，。！？；：、]$/,'');})
+    .filter(Boolean);
+  if(lines.length < 2) return null;
+  for(var i=0;i<lines.length;i++){
+    if(lines[i].indexOf(q.blank)===-1){
+      var fullFirst = q.full.split('\n')[0].replace(/[，。！？；：]/g,'').trim();
+      var isUpper = (fullFirst.indexOf(q.blank)===-1);
+      return {text:lines[i], tag: isUpper ? '上联' : '下联', auto:true};
+    }
+  }
+  return null;
+}
+
+function loadQ(){
+  G.answered=false;
+  var q=G.questions[G.cur];
+  var n=G.cur+1, tot=G.questions.length;
+  var lv=LEVELS[G.lvIdx];
+
+  el('prog-txt').textContent='第 '+n+' 题';
+  el('prog-pct').textContent=(n-1)+' / '+tot;
+  el('prog-fill').style.width=((G.cur/tot)*100)+'%';
+  el('score-badge').textContent=G.score+'分';
+  el('streak-n').textContent=G.streak;
+  el('src-tag').textContent=q.src;
+
+  var nQ=Array.from(q.blank).length;
+  var ph=Array.from({length:nQ},function(){return '？';}).join('');
+  el('q-line1').innerHTML=escH(q.before)+'<span class="blank" id="blank-el">'+ph+'</span>'+escH(q.after);
+  // Show partner line as hint
+  var hint = getHint(q);
+  if(hint && hint.auto){
+    el('hint-row').style.display='block';
+    el('hint-tag').textContent=hint.tag;
+    el('hint-txt').textContent=hint.text;
+    el('q-line2').textContent='';
+  } else if(hint && !hint.auto){
+    el('hint-row').style.display='none';
+    el('q-line2').textContent=hint.text;
+  } else {
+    el('hint-row').style.display='none';
+    el('q-line2').textContent='';
+  }
+
+  var shuffled=shuffle(q.opts.slice());
+  for(var i=0;i<4;i++){
+    var btn=el('opt'+i);
+    btn.textContent=shuffled[i];
+    btn.className='opt';
+    btn.disabled=false;
+    btn.dataset.val=shuffled[i];
+  }
+  var fb=el('feedback');
+  fb.className='feedback'; fb.style.display='none';
+
+  var isLast=(G.cur+1)>=G.questions.length;
+  el('next-btn').textContent=isLast?'查看本关成绩 →':'继续下一题 →';
+
+  setTimeout(function(){
+    var firstBtn=document.querySelector('.opt:not([disabled])');
+    if(firstBtn) firstBtn.focus();
+  },160);
+}
+
+function pickOpt(btn){
+  if(G.answered) return;
+  G.answered=true;
+  var q=G.questions[G.cur];
+  var pick=btn.dataset.val;
+  var ok=(pick===q.blank);
+
+  if(ok){
+    G.streak++; if(G.streak>G.maxStreak) G.maxStreak=G.streak;
+    G.score+=(G.streak>=3?7:5);
+  } else { G.streak=0; }
+
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok){
+    document.querySelectorAll('.opt').forEach(function(b){
+      if(b.dataset.val===q.blank) b.classList.add('reveal');
+    });
+  }
+  document.querySelectorAll('.opt').forEach(function(b){b.disabled=true;});
+
+  var badge=el('streak-badge');
+  badge.classList.remove('pulse'); void badge.offsetWidth;
+  if(ok&&G.streak>0) badge.classList.add('pulse');
+  el('streak-n').textContent=G.streak;
+  el('score-badge').textContent=G.score+'分';
+
+  var blankEl=document.getElementById('blank-el');
+  if(blankEl){
+    blankEl.textContent=q.blank;
+    blankEl.style.color=ok?'var(--green)':'var(--red)';
+    blankEl.style.borderBottomColor=ok?'var(--green)':'var(--red)';
+  }
+
+  var fb=el('feedback');
+  fb.style.display='block';
+  fb.className='feedback show '+(ok?'ok':'err');
+
+  var head=el('fb-head');
+  head.className='fb-head '+(ok?'ok':'err');
+  if(ok){
+    var msgs=['答对了！','完全正确！','真棒！','厉害！','妙极！'];
+    if(G.streak>=3) msgs=['🔥 连击×'+G.streak+'！','一气呵成！','势如破竹！'];
+    head.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  } else {
+    head.textContent='答错了，正确答案是「'+q.blank+'」';
+  }
+
+  var spBtn=el('speak-btn');
+  if(spBtn) spBtn.className='speak-btn'+(ok?'':' err-s');
+
+  var fullHtml=escH(q.full).replace(escH(q.blank),'<span class="hl">'+escH(q.blank)+'</span>');
+  el('full-couplet').innerHTML=fullHtml.replace(/\n/g,'<br>');
+  el('fb-exp').textContent=q.exp;
+
+  G.history.push({q:q.before+'___'+q.after, ans:pick, blank:q.blank, ok:ok});
+  setTimeout(function(){speakCouplet(q.full);},420);
+}
+
+function doNext(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  _ttsPending='';
+  G.cur++;
+  if(G.cur>=G.questions.length){ showLevelEnd(); }
+  else { loadQ(); }
+}
+
+/* ============================================================
+   LEVEL END
+============================================================ */
+function showLevelEnd(){
+  var lv=LEVELS[G.lvIdx];
+  var maxBase=G.questions.length*5;
+  var stars=starsFor(G.score, maxBase+G.maxStreak*2+10);
+  var r=rank(G.score/Math.max(1,maxBase));
+
+  // Save progress
+  if(stars>(PROG.stars[G.lvIdx+1]||0)) PROG.stars[G.lvIdx+1]=stars;
+  if(G.score>(PROG.scores[G.lvIdx+1]||0)) PROG.scores[G.lvIdx+1]=G.score;
+  var nextLvId=G.lvIdx+2;
+  if(stars>=1 && nextLvId>PROG.unlocked) PROG.unlocked=nextLvId;
+  saveProgress(PROG);
+
+  el('le-icon').textContent=r.icon;
+  el('le-stars').textContent=starStr(stars);
+  el('le-score').textContent=G.score;
+  el('le-max').textContent=maxBase+'+';
+  el('le-title').textContent=r.t;
+  el('le-desc').textContent=r.d;
+
+  // Show unlock message
+  var ulBox=el('le-unlock');
+  if(stars>=1 && G.lvIdx+1<LEVELS.length){
+    var nextLv=LEVELS[G.lvIdx+1];
+    ulBox.style.display='block';
+    el('le-unlock-txt').textContent='「'+nextLv.name+'」已解锁！'+nextLv.desc;
+  } else { ulBox.style.display='none'; }
+
+  // History
+  var html=G.history.map(function(h){
+    return '<div class="hist-row">'+
+      '<span style="font-size:14px;flex-shrink:0">'+(h.ok?'✅':'❌')+'</span>'+
+      '<span class="hist-q">'+escH(h.q)+'</span>'+
+      '<span class="hist-a" style="color:'+(h.ok?'var(--green)':'var(--red)')+'">'+escH(h.ok?h.blank:h.ans)+'</span>'+
+      '</div>';
+  }).join('');
+  el('le-hist').innerHTML=html;
+
+  // Buttons
+  var hasNext=G.lvIdx+1<LEVELS.length && nextLvId<=PROG.unlocked;
+  el('le-next-btn').style.display=hasNext?'block':'none';
+
+  el('prog-fill').style.width='100%';
+  el('prog-pct').textContent=G.questions.length+' / '+G.questions.length;
+
+  show('lvend-screen');
+}
+
+/* ============================================================
+   EVENTS
+============================================================ */
+document.addEventListener('DOMContentLoaded',function(){
+  _initTTS();
+  renderMap();
+
+  el('back-btn').addEventListener('click',function(){
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+    _ttsPending='';
+    renderMap();
+    show('map-screen');
+  });
+  el('next-btn').addEventListener('click',doNext);
+  el('le-next-btn').addEventListener('click',function(){
+    startLevel(G.lvIdx+1);
+  });
+  el('le-retry-btn').addEventListener('click',function(){
+    startLevel(G.lvIdx);
+  });
+  el('le-map-btn').addEventListener('click',function(){
+    renderMap(); show('map-screen');
+  });
+
+  for(var i=0;i<4;i++){
+    (function(idx){
+      el('opt'+idx).addEventListener('click',function(){pickOpt(this);});
+    })(i);
+  }
+
+  document.addEventListener('keydown',function(e){
+    if(!el('game-screen').classList.contains('active')) return;
+    var map={'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3};
+    var k=e.key.toLowerCase();
+    if(k in map && !G.answered){ pickOpt(el('opt'+map[k])); }
+    else if((k==='enter'||k===' ')&&G.answered){ doNext(); }
+  });
+});
+</script>
+</body>
+</html>
