@@ -16,26 +16,26 @@
   --purple:#6b3fa0;--pur-lt:#f3eeff;
   --border:rgba(44,26,6,.10);--shadow:0 2px 16px rgba(44,26,6,.08);
 }
-body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:18px 14px 72px}
+body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:12px 14px 48px}
 #app{width:100%;max-width:480px}
 .screen{display:none}
 .screen.active{display:block;animation:up .28s cubic-bezier(.22,1,.36,1)}
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── CARD ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px 20px;box-shadow:var(--shadow);position:relative}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);position:relative}
 
 /* ── BRAND ── */
-.brand-hero{text-align:center;padding:24px 0 20px}
-.brand-big{font-size:54px;font-weight:900;color:var(--red);letter-spacing:12px;line-height:1;text-shadow:2px 2px 0 rgba(200,50,26,.12)}
+.brand-hero{text-align:center;padding:16px 0 14px}
+.brand-big{font-size:46px;font-weight:900;color:var(--red);letter-spacing:12px;line-height:1;text-shadow:2px 2px 0 rgba(200,50,26,.12)}
 .brand-en{font-size:10px;letter-spacing:6px;color:var(--ink3);margin-top:5px;font-family:"PingFang SC",sans-serif;font-weight:400}
-.brand-sample{font-size:17px;color:var(--ink2);margin-top:12px;letter-spacing:4px;line-height:2.1}
+.brand-sample{font-size:15px;color:var(--ink2);margin-top:8px;letter-spacing:4px;line-height:1.9}
 .brand-sample span{color:var(--red);font-weight:700}
 
 /* ── LEVELS ── */
-.levels-title{font-size:11px;letter-spacing:3px;color:var(--ink3);margin-bottom:14px;font-family:"PingFang SC",sans-serif;font-weight:400}
-.level-grid{display:flex;flex-direction:column;gap:10px}
-.lv-card{display:flex;align-items:center;gap:14px;padding:16px 16px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;transition:border-color .18s,background .18s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none}
+.levels-title{font-size:11px;letter-spacing:3px;color:var(--ink3);margin-bottom:10px;font-family:"PingFang SC",sans-serif;font-weight:400}
+.level-grid{display:flex;flex-direction:column;gap:8px}
+.lv-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;transition:border-color .18s,background .18s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none}
 .lv-card:active{transform:scale(.975)}
 .lv-card.unlocked:hover{border-color:rgba(200,50,26,.35);background:rgba(200,50,26,.03)}
 .lv-card.locked{opacity:.48;cursor:default}
@@ -49,13 +49,13 @@ body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",se
 .lock-icon{font-size:18px;color:var(--ink3)}
 
 /* ── PROGRESS BAR ── */
-.prog-wrap{margin-bottom:18px}
-.prog-meta{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--ink3)}
+.prog-wrap{margin-bottom:10px}
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;color:var(--ink3)}
 .prog{height:6px;background:rgba(44,26,6,.08);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--red) 0%,var(--gold) 100%);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
 
 /* ── TOP BAR ── */
-.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;min-height:34px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;min-height:30px}
 .logo-sm{font-size:13px;font-weight:700;color:var(--red);letter-spacing:2px;cursor:pointer}
 .hd-right{display:flex;align-items:center;gap:10px}
 .streak{display:flex;align-items:center;gap:4px;background:var(--gold-lt);border:1px solid rgba(200,134,10,.25);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--gold);transition:all .2s}
@@ -64,16 +64,16 @@ body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",se
 .lv-badge{font-size:11px;color:var(--ink3);font-family:"PingFang SC",sans-serif;padding:3px 9px;border-radius:10px;border:1px solid var(--border)}
 
 /* ── COUPLET ── */
-.src-tag{font-size:10px;letter-spacing:2px;color:var(--ink3);font-family:"PingFang SC",sans-serif;font-weight:400;margin-bottom:12px}
-.q-label{font-size:11px;letter-spacing:2px;color:var(--ink3);font-family:"PingFang SC",sans-serif;font-weight:400;margin-bottom:12px}
-.couplet-box{text-align:center;padding:16px 0 20px;border-bottom:1px solid var(--border);margin-bottom:18px}
-.couplet-line{font-size:30px;font-weight:700;color:var(--ink);letter-spacing:6px;line-height:1.4}
-.blank{display:inline-block;min-width:32px;padding:0 3px;height:36px;line-height:36px;border-bottom:3px solid var(--red);color:var(--red);font-size:26px;vertical-align:middle;text-align:center;letter-spacing:4px;box-sizing:content-box}
-.couplet-line2{font-size:18px;color:var(--ink3);letter-spacing:4px;margin-top:8px}
+.src-tag{font-size:10px;letter-spacing:2px;color:var(--ink3);font-family:"PingFang SC",sans-serif;font-weight:400;margin-bottom:8px}
+.q-label{font-size:11px;letter-spacing:2px;color:var(--ink3);font-family:"PingFang SC",sans-serif;font-weight:400;margin-bottom:8px}
+.couplet-box{text-align:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.couplet-line{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:5px;line-height:1.25}
+.blank{display:inline-block;min-width:32px;padding:0 3px;height:30px;line-height:30px;border-bottom:2px solid var(--red);color:var(--red);font-size:22px;vertical-align:middle;text-align:center;letter-spacing:4px;box-sizing:content-box}
+.couplet-line2{font-size:14px;color:var(--ink3);letter-spacing:3px;margin-top:4px}
 
 /* ── OPTIONS ── */
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.opt{padding:14px 6px;border:2px solid var(--border);border-radius:13px;background:var(--card);font-size:22px;font-weight:700;color:var(--ink);text-align:center;cursor:pointer;letter-spacing:3px;transition:border-color .15s,background .15s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.opt{padding:10px 4px;border:2px solid var(--border);border-radius:11px;background:var(--card);font-size:20px;font-weight:700;color:var(--ink);text-align:center;cursor:pointer;letter-spacing:3px;transition:border-color .15s,background .15s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none}
 .opt:hover:not(:disabled){border-color:rgba(200,50,26,.35);background:rgba(200,50,26,.04)}
 .opt:active:not(:disabled){transform:scale(.955)}
 .opt.correct{border-color:var(--green);background:var(--grn-lt);color:var(--green);animation:correctPop .35s cubic-bezier(.22,1,.36,1)}
@@ -84,22 +84,22 @@ body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",se
 @keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
 /* ── FEEDBACK ── */
-.feedback{margin-top:16px;border-radius:13px;padding:15px;display:none;border:1px solid transparent}
+.feedback{margin-top:10px;border-radius:11px;padding:11px;display:none;border:1px solid transparent}
 .feedback.show{display:block;animation:up .25s ease}
 .feedback.ok{background:var(--grn-lt);border-color:rgba(42,122,72,.2)}
 .feedback.err{background:var(--red-lt);border-color:rgba(200,50,26,.18)}
-.fb-head{font-size:15px;font-weight:700;margin-bottom:8px;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.fb-head{font-size:13px;font-weight:700;margin-bottom:5px;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
 .fb-head.ok{color:var(--green)}
 .fb-head.err{color:var(--red)}
-.full-couplet{font-size:17px;font-weight:700;letter-spacing:3px;color:var(--ink);margin-bottom:10px;padding:10px 14px;background:rgba(44,26,6,.04);border-radius:8px;line-height:1.85}
+.full-couplet{font-size:15px;font-weight:700;letter-spacing:2px;color:var(--ink);margin-bottom:7px;padding:8px 12px;background:rgba(44,26,6,.04);border-radius:8px;line-height:1.7}
 .full-couplet .hl{color:var(--red)}
-.fb-exp{font-size:13px;color:var(--ink2);line-height:1.9;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-weight:400}
+.fb-exp{font-size:12px;color:var(--ink2);line-height:1.75;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-weight:400}
 
-.hint-row{margin-bottom:10px;padding:8px 14px;background:rgba(200,134,10,.08);border-radius:10px;border-left:3px solid var(--gold);text-align:left}
+.hint-row{margin-bottom:8px;padding:6px 12px;background:rgba(200,134,10,.08);border-radius:10px;border-left:3px solid var(--gold);text-align:left}
 .hint-tag{font-size:10px;letter-spacing:2px;color:var(--gold);font-family:"PingFang SC",sans-serif;font-weight:700;display:block;margin-bottom:4px}
-.hint-txt{font-size:22px;font-weight:700;color:var(--ink2);letter-spacing:5px}
+.hint-txt{font-size:19px;font-weight:700;color:var(--ink2);letter-spacing:4px}
 /* ── SPEAK ── */
-.speak-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;margin-bottom:12px;border-radius:20px;border:1.5px solid rgba(42,122,72,.35);background:rgba(42,122,72,.08);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:background .15s;-webkit-tap-highlight-color:transparent;line-height:1}
+.speak-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;margin-bottom:8px;border-radius:20px;border:1.5px solid rgba(42,122,72,.35);background:rgba(42,122,72,.08);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:background .15s;-webkit-tap-highlight-color:transparent;line-height:1}
 .speak-btn.err-s{background:rgba(200,50,26,.07);border-color:rgba(200,50,26,.3);color:var(--red)}
 .speak-btn:hover{background:rgba(42,122,72,.16)}
 .speak-icon{font-size:16px}
@@ -107,7 +107,7 @@ body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",se
 @keyframes speakPulse{from{transform:scale(1)}to{transform:scale(1.28)}}
 
 /* ── NEXT BTN ── */
-.next-btn{display:block;width:100%;margin-top:14px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:opacity .15s,transform .12s;-webkit-tap-highlight-color:transparent;letter-spacing:2px}
+.next-btn{display:block;width:100%;margin-top:10px;padding:11px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:opacity .15s,transform .12s;-webkit-tap-highlight-color:transparent;letter-spacing:2px}
 .next-btn:hover{opacity:.9}
 .next-btn:active{transform:scale(.97)}
 
@@ -134,7 +134,9 @@ body{font-family:"STKaiti","Kaiti SC","KaiTi","PingFang SC","Microsoft YaHei",se
 .btn-outline{padding:14px;background:transparent;color:var(--red);border:1.5px solid rgba(200,50,26,.35);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:2px;font-family:"PingFang SC",sans-serif;transition:background .15s;-webkit-tap-highlight-color:transparent}
 .btn-outline:hover{background:rgba(200,50,26,.04)}
 
-@media(max-width:400px){.brand-big{font-size:44px;letter-spacing:8px}.couplet-line{font-size:24px;letter-spacing:4px}.opt{font-size:18px;padding:12px 4px}}
+@media(max-width:390px){.brand-big{font-size:36px;letter-spacing:6px}.couplet-line{font-size:22px;letter-spacing:3px}.opt{font-size:17px;padding:8px 3px}}
+@media(min-width:768px){body{padding:20px 0 40px}#app{max-width:560px}.couplet-line{font-size:30px;letter-spacing:6px}.opt{font-size:22px;padding:14px 8px}.card{padding:20px 24px}.hint-txt{font-size:22px}.full-couplet{font-size:17px}}
+@media(min-width:1024px){#app{max-width:600px}}
 </style>
 </head>
 <body>
